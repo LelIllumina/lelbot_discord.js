@@ -26,8 +26,8 @@ for (const folder of commandFolders) {
     const command = await import(filePath);
 
     // Ensure the command has the required properties before adding
-    if ("data" in command && "execute" in command) {
-      client.commands.set(command.data.name, command);
+    if (data && execute) {
+      client.commands.set(data.name, { data, execute });
     } else {
       console.log(
         `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
