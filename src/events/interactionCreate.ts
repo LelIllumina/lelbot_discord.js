@@ -1,8 +1,8 @@
 import {
-    type CacheType,
-    Events,
-    type Interaction,
-    MessageFlags,
+  type CacheType,
+  Events,
+  type Interaction,
+  MessageFlags,
 } from "discord.js";
 
 export default {

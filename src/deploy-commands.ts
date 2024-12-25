@@ -1,6 +1,7 @@
 import { readdirSync } from "fs";
 import { join } from "path";
 import { type APIApplicationCommand, REST, Routes } from "discord.js";
+import { ansi } from "./ANSI";
 
 const commands = [];
 // Grab all the command folders from the commands directory you created earlier
@@ -15,13 +16,17 @@ for (const folder of commandFolders) {
   // Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
   for (const file of commandFiles) {
     const filePath = join(commandsPath, file);
-    const command = await import(filePath);
+    const command = (await import(filePath)).default;
 
     if ("data" in command && "execute" in command) {
       commands.push(command.data.toJSON());
     } else {
-      console.log(
-        `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+      console.warn(
+        `${ansi.bold + ansi.bgYellow}[WARNING]${
+          ansi.reset + ansi.yellow
+        } The command at ${filePath} is missing a required "data" or "execute" property. ${
+          ansi.reset
+        }`
       );
     }
   }
@@ -34,7 +39,7 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 (async () => {
   try {
     console.log(
-      `Started refreshing ${commands.length} application (/) commands.`
+      `${ansi.green}Started refreshing ${commands.length} application (/) commands.${ansi.reset}`
     );
 
     // The put method is used to fully refresh all commands in the guild with the current set
@@ -48,7 +53,7 @@ const rest = new REST().setToken(process.env.DISCORD_TOKEN);
     )) as APIApplicationCommand[];
 
     console.log(
-      `Successfully reloaded ${data.length} application (/) commands.`
+      `${ansi.green}Successfully reloaded ${data.length} application (/) commands.${ansi.reset}`
     );
   } catch (error) {
     // And of course, make sure you catch and log any errors!
