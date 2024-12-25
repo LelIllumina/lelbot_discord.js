@@ -1,12 +1,6 @@
 import { readdirSync } from "fs";
 import { join } from "path";
-import {
-  Client,
-  Collection,
-  Events,
-  GatewayIntentBits,
-  MessageFlags,
-} from "discord.js";
+import { Client, Collection, GatewayIntentBits } from "discord.js";
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -23,7 +17,8 @@ for (const folder of commandFolders) {
 
   for (const file of commandFiles) {
     const filePath = join(commandsPath, file);
-    const command = await import(filePath);
+    const command = (await import(filePath)).default;
+    const { data, execute } = command;
 
     // Ensure the command has the required properties before adding
     if (data && execute) {
@@ -36,41 +31,19 @@ for (const folder of commandFolders) {
   }
 }
 
-client.on(Events.InteractionCreate, async (interaction) => {
-  if (!interaction.isChatInputCommand()) {
-    return;
+const eventsPath = join(import.meta.dir, "events");
+const eventFiles = readdirSync(eventsPath).filter((file) =>
+  file.endsWith(".ts")
+);
+
+for (const file of eventFiles) {
+  const filePath = join(eventsPath, file);
+  const event = (await import(filePath)).default;
+  if (event.once) {
+    client.once(event.name, (...args) => event.execute(...args));
+  } else {
+    client.on(event.name, (...args) => event.execute(...args));
   }
+}
 
-  const command = interaction.client.commands.get(interaction.commandName);
-
-  if (!command) {
-    console.error(`No command matching ${interaction.commandName} was found.`);
-    return;
-  }
-
-  try {
-    await command.execute(interaction);
-  } catch (error) {
-    console.error(error);
-    if (interaction.replied || interaction.deferred) {
-      await interaction.followUp({
-        content: "There was an error while executing this command!",
-        flags: MessageFlags.Ephemeral,
-      });
-    } else {
-      await interaction.reply({
-        content: "There was an error while executing this command!",
-        flags: MessageFlags.Ephemeral,
-      });
-    }
-  }
-});
-
-client.once(Events.ClientReady, (readyClient) => {
-  console.log(
-    `\x1b[1;34mReady!\x1b[1;0m \x1b[0;32mLogged in as ${readyClient.user.tag}\x1b[0;0m`
-  );
-});
-
-// Log in to Discord with your client's token
 client.login(process.env.DISCORD_TOKEN);
