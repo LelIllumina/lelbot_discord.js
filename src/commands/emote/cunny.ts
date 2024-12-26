@@ -7,6 +7,6 @@ export default {
     .setName("cunny")
     .setDescription("cnuuy :sob:"),
   async execute(interaction: CommandInteraction) {
-    await interaction.reply(cunny[0]);
+    await interaction.reply(cunny[Math.floor(Math.random() * cunny.length)]);
   },
 };
