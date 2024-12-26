@@ -23,6 +23,11 @@
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": true,
 
-    "typeRoots": ["src/@types", "node_modules/@types"]
+    "typeRoots": ["src/@types", "node_modules/@types"],
+
+    "baseUrl": ".",
+    "paths": {
+      "@messages/*": ["src/messages/*"]
+    }
   }
 }
