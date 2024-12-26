@@ -12,7 +12,8 @@
   "scripts": {
     "start": "bun .",
     "watch": "bun --watch .",
-    "hot": "bun --hot ."
+    "hot": "bun --hot .",
+    "register": "bun src/deploy-commands.ts"
   },
   "type": "module"
 }
